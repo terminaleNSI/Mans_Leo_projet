@@ -1,23 +1,36 @@
 from pycoingecko import CoinGeckoAPI
 import time
+""" Initialisation de l'API """
+
 cg = CoinGeckoAPI()
+#print(cg.ping())
 
-print(cg.ping())
-ide = cg.get_coins_list()[0]['id']
-#print(cg.get_exchanges_list())
-
+""" Mise en place du systeme de temps (en valeur UNIX) """
 actuel_time = time.time()
 time_1h = actuel_time - (86400/24)
 time_24h = actuel_time - (86400)
 time_7j = actuel_time - (86400*7)
 time_31j= actuel_time - (86400*31)
-btc1h= cg.get_coin_market_chart_range_by_id('bitcoin', 'usd',time_24h,actuel_time)
-#btc7j= cg.get_coin_market_chart_range_by_id('bitcoin', 'usd',time_7j,actuel_time)
-#btc31j= cg.get_coin_market_chart_range_by_id('bitcoin', 'usd',time_31j,actuel_time)
 
 
-#print("Le bitcoin vaut : "+str(int(btc1h["prices"][87][1]))+"$ il valait : "+str(int(btc7j["prices"][168][1]))+"$ il y a 7 jour, et il valait "+str(int(btc31j["prices"][720][1])) +"$ il y a un mois.")
-timee = 5
-for i in btc1h["prices"] :
-    print("Bitcoin il y a "+str(timee)+" min ="+str(int(i[1]))+"$")
-    timee+=5
+a2234 = cg.get_exchanges_list()
+liste_monnaies = cg.get_coins_list() # Liste de toute les cryptomonnaies
+liste_type_monnaies = cg.get_supported_vs_currencies() # liste des types de monnaie(eur,usd,btc)
+info_globale = cg.get_global() # information globale sur les crypto
+#price = cg.get_price()
+
+btc1h= cg.get_coin_market_chart_range_by_id('bitcoin', 'usd',0,actuel_time)
+btc = cg.get_coin_by_id("01coin")
+
+""" Mise en place d'une liste contenant les informations principales"""
+
+informations = []
+for i in liste_monnaies[29:] :
+    try :
+        prixMois = cg.get_coin_market_chart_range_by_id(i["id"],'usd',time_31j,actuel_time)
+        prixJour = cg.get_coin_market_chart_range_by_id(i["id"],'usd',time_24h,actuel_time)
+        image  = cg.get_coin_by_id(i["id"])["image"]
+        dico ={"Nom" : i["name"], "Prix_Mois($)" : prixMois,"Prix_Jour($)" : prixJour,"Image" : image }
+        informations.append(dico)
+    except : 
+        pass
